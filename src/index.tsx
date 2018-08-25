@@ -23,7 +23,7 @@ const plugin: JupyterLabPlugin<void> = {
     tracker: INotebookTracker,
     palette: ICommandPalette
   ): void => {
-    console.log(7)
+    console.log(9)
 
     /** Create command, add to palette and menu */
     const command: string = 'easygit:store-version';
@@ -31,6 +31,8 @@ const plugin: JupyterLabPlugin<void> = {
       label: 'Store Version',
       execute: async () => {
         console.log('that was easy (git)')
+        app.commands.execute('docmanager:save')
+
         let value = ''
         var textBox = React.createElement(
           'input', 
@@ -38,7 +40,8 @@ const plugin: JupyterLabPlugin<void> = {
             onChange: (event) => {
               value = event.currentTarget.value
             },
-            className: 'input'
+            className: 'input',
+            placeholder: 'What have you changed?'
           }
         )
         showDialog({
@@ -50,7 +53,7 @@ const plugin: JupyterLabPlugin<void> = {
               label: 'STORE'
             })
           ],
-        }).then(result => {
+        }).then(async result => {
           if (result.button.accept) {
             console.log('storing!')
             console.log(value)
@@ -178,5 +181,6 @@ async function storeVersion(
   } catch (err) {
     throw ServerConnection.NetworkError;
   }
+}
 
 export default plugin;
