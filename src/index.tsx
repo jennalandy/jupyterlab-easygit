@@ -1,7 +1,7 @@
 import { JupyterLab, JupyterLabPlugin } from '@jupyterlab/application';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { INotebookTracker } from '@jupyterlab/notebook';
-import { ICommandPalette, ToolbarButton } from '@jupyterlab/apputils';
+import { ToolbarButton } from '@jupyterlab/apputils';
 import { iconStyle } from './buttonStyle'
 import { showDialog, Dialog } from '@jupyterlab/apputils'
 import '../style/variables.css'
@@ -16,21 +16,18 @@ export interface GitShowTopLevelResult {
 
 const plugin: JupyterLabPlugin<void> = {
   id: 'jupyterlab-easygit:plugin',
-  requires: [ IMainMenu, INotebookTracker, ICommandPalette],
+  requires: [ IMainMenu, INotebookTracker],
   activate: (
     app: JupyterLab,
     menu: IMainMenu,
     tracker: INotebookTracker,
-    palette: ICommandPalette
   ): void => {
-    console.log(9)
 
-    /** Create command, add to palette and menu */
+    /** Create command, add to menu */
     const command: string = 'easygit:store-version';
     app.commands.addCommand(command, {
       label: 'Store Version',
       execute: async () => {
-        console.log('that was easy (git)')
         app.commands.execute('docmanager:save')
 
         let value = ''
@@ -55,8 +52,6 @@ const plugin: JupyterLabPlugin<void> = {
           ],
         }).then(async result => {
           if (result.button.accept) {
-            console.log('storing!')
-            console.log(value)
             let repoPath = await gitRefresh(app.shell.widgets('left'));
             storeVersion(
               value,
@@ -67,7 +62,6 @@ const plugin: JupyterLabPlugin<void> = {
         })
       }
     })
-    palette.addItem({command, category: 'Aaaa'})
     menu.fileMenu.addGroup([{command: command}], 14)
 
     /** If in a notebook, add button to toolbar
@@ -118,7 +112,6 @@ async function gitRefresh(leftSidebarItems: any) {
     if (apiResult['code'] === 0) {
       // Get top level path of repo
       let topLevel = apiResult['data']['show_top_level']['top_repo_path'];
-      console.log(topLevel);
       return topLevel;
     }
   }
@@ -162,7 +155,6 @@ async function storeVersion(
   repoPath: string
 ): Promise<Response> {
   try {
-    console.log(message, fileName, repoPath);
     let addResponse = await httpGitRequest('/git/add', 'POST', {
       add_all: true,
       filename: fileName,
