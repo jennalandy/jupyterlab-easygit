@@ -31,11 +31,8 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^0.18.4",
-    "@jupyterlab/apputils": "^0.18.2",
-    "@jupyterlab/coreutils": "^2.0.2"
     "@jupyterlab/mainmenu": "^0.7.4",
-    "@jupyterlab/notebook": "^0.18.4",
-    "typestyle": "^2.0.1"
+    "@jupyterlab/notebook": "^0.18.4"
   },
   "devDependencies": {
     "prettier": "^1.13.7",
