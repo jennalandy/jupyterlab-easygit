@@ -30,7 +30,10 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^0.18.4"
+    "@jupyterlab/application": "^0.18.4",
+    "@jupyterlab/notebook": "^0.18.2",
+    "@jupyterlab/apputils": "^0.18.2",
+    "@jupyterlab/coreutils": "^2.0.2"
   },
   "devDependencies": {
     "prettier": "^1.13.7",
