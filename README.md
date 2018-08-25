@@ -1,6 +1,8 @@
 # jupyterlab-easygit
 
-A JupyterLab extension enabling non-git users to store versions of their work.
+A JupyterLab extension enabling non-Git users to store versions of their work. This is intended for Git-savvy users to track changes made by team members to implement version control without teaching Git.
+
+![](http://g.recordit.co/DxWkhlc8RB.gif)
 
 ## Prerequisites
 
