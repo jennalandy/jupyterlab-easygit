@@ -28,38 +28,50 @@ const plugin: JupyterLabPlugin<void> = {
     app.commands.addCommand(command, {
       label: 'Store Version',
       execute: async () => {
-        app.commands.execute('docmanager:save')
 
-        let value = ''
-        var textBox = React.createElement(
-          'input', 
-          {
-            onChange: (event) => {
-              value = event.currentTarget.value
-            },
-            className: 'input',
-            placeholder: 'What have you changed?'
-          }
-        )
-        showDialog({
-          title: 'Store Version',
-          body: textBox,
-          buttons: [
-            Dialog.cancelButton(),
-            Dialog.okButton({
-              label: 'STORE'
-            })
-          ],
-        }).then(async result => {
-          if (result.button.accept) {
-            let repoPath = await gitRefresh(app.shell.widgets('left'));
-            storeVersion(
-              value,
-              tracker.currentWidget.context.path,
-              repoPath
-            );
-          }
-        })
+        await app.commands.execute('docmanager:save')
+        let gitSt = await status('')
+        if (gitSt.files.length > 0) {
+          let value = ''
+          var textBox = React.createElement(
+            'input', 
+            {
+              onChange: (event) => {
+                value = event.currentTarget.value
+              },
+              className: 'input',
+              placeholder: 'What have you changed?'
+            }
+          )
+          showDialog({
+            title: 'Store Version',
+            body: textBox,
+            buttons: [
+              Dialog.cancelButton(),
+              Dialog.okButton({
+                label: 'STORE'
+              })
+            ],
+          }).then(async result => {
+            if (result.button.accept) {
+              let repoPath = await gitRefresh(app.shell.widgets('left'));
+              storeVersion(
+                value,
+                tracker.currentWidget.context.path,
+                repoPath
+              );
+            }
+          })
+        } else {
+          showDialog({
+            title: 'Version Already Stored',
+            buttons: [
+              Dialog.okButton({
+                label: 'OK'
+              })
+            ],
+          })
+        }
       }
     })
     menu.fileMenu.addGroup([{command: command}], 14)
@@ -170,6 +182,39 @@ async function storeVersion(
       });
     }
     return commitResponse;
+  } catch (err) {
+    throw ServerConnection.NetworkError;
+  }
+}
+
+/** Interface for GitStatus request result, 
+ * has the status of each changed file */
+export interface GitStatusFileResult {
+  x: string;
+  y: string;
+  to: string;
+  from: string;
+}
+
+/** Interface for GitStatus request result, 
+  * has the status of the entire repo */
+export interface GitStatusResult {
+  code: number;
+  files?: [GitStatusFileResult];
+}
+
+/** Make request for git status of repository 'path' */
+async function status(path: string): Promise<GitStatusResult> {
+  try {
+    let response = await httpGitRequest('/git/status', 'POST', {
+      current_path: path
+    });
+    if (response.status !== 200) {
+      return response.json().then((data: any) => {
+        throw new ServerConnection.ResponseError(response, data.message);
+      });
+    }
+    return response.json();
   } catch (err) {
     throw ServerConnection.NetworkError;
   }
