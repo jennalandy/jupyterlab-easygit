@@ -10,6 +10,7 @@ A JupyterLab extension enabling non-Git users to store versions of their work. T
 
 ## Usage
 
+- *JupyterLab must be started within a Git repository.*
 - Store a version of your folder with File > Store Version or the second icon on the notebook toolbar.
 
 ## Install
